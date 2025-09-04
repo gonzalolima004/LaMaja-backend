@@ -26,17 +26,13 @@ services:
       - backend
 
   db:
-    image: mysql:8
-    container_name: mysql_db
+    image: postgres:15
+    container_name: db
     environment:
-      MYSQL_ROOT_PASSWORD: root123
-      MYSQL_DATABASE: maja
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pass123
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass123
     ports:
-      - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql
+      - "5432:5432"
 
 volumes:
   db_data:

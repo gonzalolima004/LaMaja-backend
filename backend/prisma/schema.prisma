@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -25,7 +25,7 @@ model Cobro {
   Metodo_Pago    Metodo_Pago?    @relation(fields: [id_metodo_pago], references: [id_metodo_pago], onDelete: NoAction, onUpdate: NoAction, map: "Cobro_ibfk_1")
   Factura_Venta  Factura_Venta[]
 
-  @@index([id_metodo_pago], map: "id_metodo_pago")
+  @@index([id_metodo_pago], map: "idx_cobro_metodo_pago")
 }
 
 model Detalle_Presupuesto {
@@ -36,7 +36,7 @@ model Detalle_Presupuesto {
   Ejemplar_Animal        Ejemplar_Animal? @relation(fields: [id_ejemplar_animal], references: [id_ejemplar_animal], onDelete: NoAction, onUpdate: NoAction, map: "Detalle_Presupuesto_ibfk_1")
   Presupuesto            Presupuesto[]
 
-  @@index([id_ejemplar_animal], map: "id_ejemplar_animal")
+  @@index([id_ejemplar_animal], map: "idx_detalle_ejemplar")
 }
 
 model Ejemplar_Animal {
@@ -59,7 +59,7 @@ model Factura_Venta {
   Cobro            Cobro?        @relation(fields: [id_cobro], references: [id_cobro], onDelete: NoAction, onUpdate: NoAction, map: "Factura_Venta_ibfk_1")
   Presupuesto      Presupuesto[]
 
-  @@index([id_cobro], map: "id_cobro")
+  @@index([id_cobro], map: "idx_factura_cobro")
 }
 
 model Metodo_Pago {
@@ -79,9 +79,9 @@ model Presupuesto {
   Factura_Venta          Factura_Venta?       @relation(fields: [id_factura_venta], references: [id_factura_venta], onDelete: NoAction, onUpdate: NoAction, map: "Presupuesto_ibfk_2")
   Detalle_Presupuesto    Detalle_Presupuesto? @relation(fields: [id_detalle_presupuesto], references: [id_detalle_presupuesto], onDelete: NoAction, onUpdate: NoAction, map: "Presupuesto_ibfk_3")
 
-  @@index([id_cliente], map: "id_cliente")
-  @@index([id_detalle_presupuesto], map: "id_detalle_presupuesto")
-  @@index([id_factura_venta], map: "id_factura_venta")
+  @@index([id_cliente], map: "idx_presupuesto_cliente")
+  @@index([id_detalle_presupuesto], map: "idx_presupuesto_detalle")
+  @@index([id_factura_venta], map: "idx_presupuesto_factura")
 }
 
 model Procedimiento_Veterinario {
@@ -91,7 +91,7 @@ model Procedimiento_Veterinario {
   id_ejemplar_animal           Int?
   Ejemplar_Animal              Ejemplar_Animal? @relation(fields: [id_ejemplar_animal], references: [id_ejemplar_animal], onDelete: NoAction, onUpdate: NoAction, map: "Procedimiento_Veterinario_ibfk_1")
 
-  @@index([id_ejemplar_animal], map: "id_ejemplar_animal")
+  @@index([id_ejemplar_animal], map: "idx_procedimiento_ejemplar")
 }
 
 model Rol {
@@ -110,7 +110,7 @@ model Usuario_Sistema {
   contrasena String? @db.VarChar(50)
   Rol        Rol?    @relation(fields: [id_rol], references: [id_rol], onDelete: NoAction, onUpdate: NoAction, map: "Usuario_Sistema_ibfk_1")
 
-  @@index([id_rol], map: "id_rol")
+  @@index([id_rol], map: "idx_usuario_rol")
 }
 
 enum Metodo_Pago_tipo {
