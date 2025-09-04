@@ -1,0 +1,120 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Cliente {
+  id_cliente  Int           @id @default(autoincrement())
+  nombre      String?       @db.VarChar(50)
+  apellido    String?       @db.VarChar(50)
+  dni         String?       @db.VarChar(10)
+  direccion   String?       @db.VarChar(50)
+  Presupuesto Presupuesto[]
+}
+
+model Cobro {
+  id_cobro       Int             @id @default(autoincrement())
+  importe_total  Int?
+  fecha          DateTime?       @db.Date
+  id_metodo_pago Int?
+  Metodo_Pago    Metodo_Pago?    @relation(fields: [id_metodo_pago], references: [id_metodo_pago], onDelete: NoAction, onUpdate: NoAction, map: "Cobro_ibfk_1")
+  Factura_Venta  Factura_Venta[]
+
+  @@index([id_metodo_pago], map: "id_metodo_pago")
+}
+
+model Detalle_Presupuesto {
+  id_detalle_presupuesto Int              @id @default(autoincrement())
+  id_animal              Int?
+  precio                 Int?
+  id_ejemplar_animal     Int?
+  Ejemplar_Animal        Ejemplar_Animal? @relation(fields: [id_ejemplar_animal], references: [id_ejemplar_animal], onDelete: NoAction, onUpdate: NoAction, map: "Detalle_Presupuesto_ibfk_1")
+  Presupuesto            Presupuesto[]
+
+  @@index([id_ejemplar_animal], map: "id_ejemplar_animal")
+}
+
+model Ejemplar_Animal {
+  id_ejemplar_animal        Int                         @id @default(autoincrement())
+  peso                      Int?
+  sexo                      String?                     @db.VarChar(10)
+  estado                    String?                     @db.VarChar(50)
+  fecha_nacimiento          DateTime?                   @db.Date
+  vacunado                  Boolean?
+  Detalle_Presupuesto       Detalle_Presupuesto[]
+  Procedimiento_Veterinario Procedimiento_Veterinario[]
+}
+
+model Factura_Venta {
+  id_factura_venta Int           @id @default(autoincrement())
+  importe_total    Int?
+  fecha            DateTime?     @db.Date
+  tipo             String?       @db.VarChar(50)
+  id_cobro         Int?
+  Cobro            Cobro?        @relation(fields: [id_cobro], references: [id_cobro], onDelete: NoAction, onUpdate: NoAction, map: "Factura_Venta_ibfk_1")
+  Presupuesto      Presupuesto[]
+
+  @@index([id_cobro], map: "id_cobro")
+}
+
+model Metodo_Pago {
+  id_metodo_pago Int               @id @default(autoincrement())
+  tipo           Metodo_Pago_tipo?
+  Cobro          Cobro[]
+}
+
+model Presupuesto {
+  id_presupuesto         Int                  @id @default(autoincrement())
+  id_detalle_presupuesto Int?
+  importe_total          Int?
+  fecha                  DateTime?            @db.Date
+  id_cliente             Int?
+  id_factura_venta       Int?
+  Cliente                Cliente?             @relation(fields: [id_cliente], references: [id_cliente], onDelete: NoAction, onUpdate: NoAction, map: "Presupuesto_ibfk_1")
+  Factura_Venta          Factura_Venta?       @relation(fields: [id_factura_venta], references: [id_factura_venta], onDelete: NoAction, onUpdate: NoAction, map: "Presupuesto_ibfk_2")
+  Detalle_Presupuesto    Detalle_Presupuesto? @relation(fields: [id_detalle_presupuesto], references: [id_detalle_presupuesto], onDelete: NoAction, onUpdate: NoAction, map: "Presupuesto_ibfk_3")
+
+  @@index([id_cliente], map: "id_cliente")
+  @@index([id_detalle_presupuesto], map: "id_detalle_presupuesto")
+  @@index([id_factura_venta], map: "id_factura_venta")
+}
+
+model Procedimiento_Veterinario {
+  id_procedimiento_veterinario Int              @id @default(autoincrement())
+  tipo                         String?          @db.VarChar(50)
+  fecha                        DateTime?        @db.Date
+  id_ejemplar_animal           Int?
+  Ejemplar_Animal              Ejemplar_Animal? @relation(fields: [id_ejemplar_animal], references: [id_ejemplar_animal], onDelete: NoAction, onUpdate: NoAction, map: "Procedimiento_Veterinario_ibfk_1")
+
+  @@index([id_ejemplar_animal], map: "id_ejemplar_animal")
+}
+
+model Rol {
+  id_rol          Int               @id @default(autoincrement())
+  nombre_rol      String?           @db.VarChar(50)
+  Usuario_Sistema Usuario_Sistema[]
+}
+
+model Usuario_Sistema {
+  id_usuario Int     @id @default(autoincrement())
+  id_rol     Int?
+  nombre     String? @db.VarChar(50)
+  apellido   String? @db.VarChar(50)
+  dni        String? @db.VarChar(50)
+  email      String? @db.VarChar(50)
+  contrasena String? @db.VarChar(50)
+  Rol        Rol?    @relation(fields: [id_rol], references: [id_rol], onDelete: NoAction, onUpdate: NoAction, map: "Usuario_Sistema_ibfk_1")
+
+  @@index([id_rol], map: "id_rol")
+}
+
+enum Metodo_Pago_tipo {
+  Tarjeta
+  Efectivo
+  Transferencia
+}
