@@ -22,15 +22,22 @@ export const registrarUsuario = async (req: Request, res: Response) => {
   }
 };
 
-export const loginUsuario = async (req: Request, res: Response) => {
+export const loginUsuario = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, contrasena } = req.body;
 
     const usuario = await prisma.usuario.findUnique({ where: { email } });
-    if (!usuario)  res.status(404).json({ msg: "Usuario no encontrado" });
+
+    if (!usuario) {
+      res.status(404).json({ msg: "Usuario no encontrado" });
+      return;
+    }
 
     const valido = await bcrypt.compare(contrasena, usuario.contrasena);
-    if (!valido)  res.status(401).json({ msg: "Credenciales inválidas" });
+    if (!valido) {
+      res.status(401).json({ msg: "Credenciales inválidas" });
+      return;
+    }
 
     res.json({
       id: usuario.id_usuario,
@@ -43,6 +50,7 @@ export const loginUsuario = async (req: Request, res: Response) => {
     res.status(500).json({ error: "Error en login" });
   }
 };
+
 
 export const obtenerUsuarios = async (_req: Request, res: Response) => {
   try {

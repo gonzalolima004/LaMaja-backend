@@ -32,14 +32,14 @@
     "pg": "^8.16.3"
   },
   "devDependencies": {
-    "@prisma/client": "^6.15.0",
+    "@prisma/client": "^6.16.2",
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.15.18",
-    "prisma": "^6.15.0",
+    "prisma": "^6.16.2",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.9.2"
   }
