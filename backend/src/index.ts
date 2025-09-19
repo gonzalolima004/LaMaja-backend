@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import usuarioRoutes from './routes/usuarioRoutes'; 
+import facturaVentaRoutes from "./routes/facturaVentaRoutes";
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ app.use(cors());
 
 // Rutas
 app.use("/api/usuarios", usuarioRoutes);
+app.use("/api/facturas", facturaVentaRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend corriendo en puerto ${PORT}`));
