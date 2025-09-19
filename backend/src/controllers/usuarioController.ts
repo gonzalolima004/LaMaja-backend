@@ -3,9 +3,11 @@ import { prisma } from "../index"; // 👈 Importamos prisma desde index.ts
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/generateToken";
 
+
+
 export const registrarUsuario = async (req: Request, res: Response) => {
   try {
-    const { nombre, apellido, dni, email, contrasena, id_rol } = req.body;
+    const { nombre, apellido, dni, email, contrasena, id_rol, matricula } = req.body;
 
     const existe = await prisma.usuario.findUnique({ where: { email } });
     if (existe) res.status(400).json({ msg: "El email ya está registrado" });
@@ -15,7 +17,18 @@ export const registrarUsuario = async (req: Request, res: Response) => {
     const usuario = await prisma.usuario.create({
       data: { nombre, apellido, dni, email, contrasena: hash, id_rol }
     });
+    if (id_rol === 2) {
+      if (!matricula) {
+        res.status(400).json({ error: "La matrícula es obligatoria para veterinarios" });
+      }
 
+      await prisma.veterinario.create({
+        data: {
+          id_usuario: usuario.id_usuario,
+          matricula,
+        },
+      });
+    }
     res.json(usuario);
   } catch (error) {
     res.status(500).json({ error: "Error al registrar usuario" });
