@@ -14,7 +14,8 @@ export const crearAnimal = async (req: Request, res: Response) => {
         vacunado,
       },
     });
-    res.status(201).json(nuevoAnimal);
+    
+    res.status(201).json({ mensaje: 'Animal creado correctamente.', animal: nuevoAnimal });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al crear el animal.' });
@@ -40,7 +41,7 @@ export const getAnimalPorId = async (req: Request, res: Response) => {
     if (!animal) {
       res.status(404).json({ error: 'No existe animal con esta id' });
     }
-    res.json(animal);
+    res.status(201).json({ mensaje: 'Animal obtenido correctamente.', animal: animal });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener el animal' });

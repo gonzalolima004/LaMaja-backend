@@ -8,10 +8,10 @@ export const crearDetalle = async (req: Request, res: Response) => {
       data: { id_presupuesto, id_animal, precio },
       include: { animal: true, presupuesto: true },
     });
-    res.status(201).json(nuevoDetalle);
+    res.status(201).json({ mensaje: 'Detalle presupuesto creado correctamente.', detalle: nuevoDetalle });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al crear el detalle de presupuesto.' });
+    res.status(500).json({ error: 'Error al crear el detalle presupuesto.' });
   }
 };
 
@@ -26,7 +26,7 @@ export const getAllDetalles = async (req: Request, res: Response) => {
     res.json(detalles);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener los detalles de presupuesto.' });
+    res.status(500).json({ error: 'Error al obtener los detalles presupuesto.' });
   }
 };
 
@@ -41,12 +41,12 @@ export const getDetallePorId = async (req: Request, res: Response) => {
       },
     });
     if (!detalle) {
-      res.status(404).json({ error: 'No existe detalle de presupuesto con esta id' });
+      res.status(404).json({ error: 'No existe detalle presupuesto con esta id' });
     }
-    res.json(detalle);
+    res.status(201).json({ mensaje: 'Detalle presupuesto obtenido correctamente.', detalle: detalle });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener el detalle de presupuesto' });
+    res.status(500).json({ error: 'Error al obtener el detalle presupuesto' });
   }
 };
 
@@ -60,7 +60,7 @@ export const editarDetalle = async (req: Request, res: Response) => {
     });
 
     if (!detalleExistente) {
-      res.status(404).json({ error: 'No existe detalle de presupuesto con esta id.' });
+      res.status(404).json({ error: 'No existe detalle presupuesto con esta id.' });
       return;
     }
 
@@ -68,10 +68,10 @@ export const editarDetalle = async (req: Request, res: Response) => {
       where: { id_detalle_presupuesto },
       data: { id_animal, precio },
     });
-    res.json({ mensaje: 'Detalle de presupuesto editado con éxito', detalle: id_detalle_presupuesto });
+    res.json({ mensaje: 'Detalle presupuesto editado correctamente', detalle: id_detalle_presupuesto });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al editar el detalle de presupuesto' });
+    res.status(500).json({ error: 'Error al editar el detalle presupuesto' });
   }
 };
 
@@ -81,9 +81,9 @@ export const eliminarDetalle = async (req: Request, res: Response) => {
     await prisma.detalle_presupuesto.delete({
       where: { id_detalle_presupuesto },
     });
-    res.json({ mensaje: 'Detalle de presupuesto borrado con éxito', detalle: id_detalle_presupuesto });
+    res.json({ mensaje: 'Detalle presupuesto borrado con éxito', detalle: id_detalle_presupuesto });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al borrar el detalle de presupuesto' });
+    res.status(500).json({ error: 'Error al borrar el detalle presupuesto' });
   }
 };

@@ -16,18 +16,24 @@ export const crearPresupuesto = async (req: Request, res: Response) => {
           connect: { id_usuario }
         },
         detalles: {
-          create: detalles // array de objetos con id_animal y precio
+          create: detalles
         }
       },
       include: {
         cliente: true,
-        usuario: true,
-        facturas: true, // relación 1:N con factura_venta
+        usuario: {
+          select: {
+            id_usuario: true,
+            nombre: true,
+            apellido: true,
+          }
+        },
+        facturas: true,
         detalles: { include: { animal: true } }
       }
     });
 
-    res.status(201).json(nuevoPresupuesto);
+    res.json({ mensaje: 'Presupuesto creado correctamente', presupuesto: nuevoPresupuesto });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al crear el presupuesto.' });
@@ -39,7 +45,13 @@ export const getAllPresupuestos = async (req: Request, res: Response) => {
     const presupuestos = await prisma.presupuesto.findMany({
       include: {
         cliente: true,
-        usuario: true,
+        usuario: {
+          select: {
+            id_usuario: true,
+            nombre: true,
+            apellido: true,
+          }
+        },
         facturas: true,
         detalles: { include: { animal: true } }
       }
@@ -58,7 +70,13 @@ export const getPresupuestoPorId = async (req: Request, res: Response) => {
       where: { id_presupuesto },
       include: {
         cliente: true,
-        usuario: true,
+        usuario: {
+          select: {
+            id_usuario: true,
+            nombre: true,
+            apellido: true,
+          }
+        },
         facturas: true,
         detalles: { include: { animal: true } }
       }
@@ -66,7 +84,8 @@ export const getPresupuestoPorId = async (req: Request, res: Response) => {
     if (!presupuesto) {
       res.status(404).json({ error: 'No existe presupuesto con esta id' });
     }
-    res.json(presupuesto);
+    res.json({ mensaje: 'Presupuesto obtenido correctamente', presupuesto: presupuesto });
+    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener el presupuesto.' });
@@ -100,13 +119,19 @@ export const editarPresupuesto = async (req: Request, res: Response) => {
       },
       include: {
         cliente: true,
-        usuario: true,
+        usuario: {
+          select: {
+            id_usuario: true,
+            nombre: true,
+            apellido: true,
+          }
+        },
         facturas: true,
         detalles: { include: { animal: true } }
       }
     });
 
-    res.json({ mensaje: 'Presupuesto editado con éxito', presupuesto: presupuestoEditado });
+    res.json({ mensaje: 'Presupuesto editado correctamente', presupuesto: presupuestoEditado });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al editar el presupuesto.' });
@@ -120,7 +145,7 @@ export const eliminarPresupuesto = async (req: Request, res: Response) => {
     await prisma.presupuesto.delete({
       where: { id_presupuesto }
     });
-    res.json({ mensaje: 'Presupuesto borrado con éxito', presupuesto: id_presupuesto });
+    res.json({ mensaje: 'Presupuesto borrado correctamente', presupuesto: id_presupuesto });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al borrar el presupuesto.' });

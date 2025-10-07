@@ -12,7 +12,7 @@ export const crearProcedimiento = async (req: Request, res: Response) => {
     const nuevoProcedimiento = await prisma.procedimiento_veterinario.create({
       data: {
         tipo,
-        fecha,
+        fecha: new Date(fecha),
         id_animal,
       },
     });
@@ -69,7 +69,7 @@ export const editarProcedimiento = async (req: Request, res: Response) => {
       where: { id_procedimiento_veterinario },
       data: {
         tipo,
-        fecha,
+        fecha: new Date(fecha),
       },
     });
 

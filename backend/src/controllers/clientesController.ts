@@ -17,7 +17,10 @@ export const crearCliente = async (req: Request, res: Response) => {
         direccion: direccion,
       }
     })
-    res.status(201).json(nuevoCliente);
+    res.status(201).json({
+        mensaje: 'Cliente creado correctamente.',
+        cliente: nuevoCliente,
+      });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al crear el cliente.' });
@@ -46,7 +49,7 @@ export const getClientePorId = async (req: Request, res: Response) => {
     if (!cliente) {
       res.status(404).json({ error: 'No existe cliente registrado con esta id' });
     }
-    res.json(cliente)
+    res.status(201).json({ mensaje: 'Cliente obtenido correctamente.', cliente: cliente });
   } catch (error) {
     console.error(error)
     res.status(500).json({ error: "Error al obtener el cliente" })

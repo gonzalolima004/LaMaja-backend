@@ -18,10 +18,10 @@ export const crearFacturaVenta = async (req: Request, res: Response) => {
         }
       }
     });
-    res.status(201).json(nuevaFactura);
+    res.json({ mensaje: 'Factura creada correctamente', factura: nuevaFactura });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al crear la factura de venta.' });
+    res.status(500).json({ error: 'Error al crear la factura' });
   }
 };
 
@@ -53,10 +53,11 @@ export const getFacturaVentaPorId = async (req: Request, res: Response) => {
     if (!factura) {
       res.status(404).json({ error: 'No existe factura con esta id' });
     }
-    res.json(factura);
+    res.json({ mensaje: 'Factura obtenida correctamente', factura: factura });
+
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al obtener la factura de venta.' });
+    res.status(500).json({ error: 'Error al obtener la factura' });
   }
 };
 
@@ -88,10 +89,10 @@ export const editarFacturaVenta = async (req: Request, res: Response) => {
       }
     });
 
-    res.json({ mensaje: 'Factura de venta editada con éxito', factura: facturaEditada });
+    res.json({ mensaje: 'Factura editada correctamente', factura: facturaEditada });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al editar la factura de venta.' });
+    res.status(500).json({ error: 'Error al editar la factura' });
   }
 };
 
@@ -102,9 +103,9 @@ export const eliminarFacturaVenta = async (req: Request, res: Response) => {
     await prisma.factura_venta.delete({
       where: { id_factura_venta }
     });
-    res.json({ mensaje: 'Factura de venta borrada con éxito', factura: id_factura_venta });
+    res.json({ mensaje: 'Factura borrada correctamente', factura: id_factura_venta });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Error al borrar la factura de venta.' });
+    res.status(500).json({ error: 'Error al borrar la factura' });
   }
 };

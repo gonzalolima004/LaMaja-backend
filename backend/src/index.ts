@@ -2,14 +2,18 @@ import express, { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
+import { swaggerDocs } from './swagger/swagger.config';
 
 export const prisma = new PrismaClient();
 
 dotenv.config();
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: '*',
+}));
 
+// ---- RUTAS ----
 import authRoutes from './routes/usuariosRoutes';
 app.use('/api/usuarios', authRoutes);
 
@@ -29,10 +33,13 @@ import facturaVentaRoutes from './routes/factura_ventaRoutes';
 app.use('/api/facturas_venta', facturaVentaRoutes);
 
 import presupuestosRoutes from './routes/presupuestosRoutes';
-app.use('/api/presupuestos', presupuestosRoutes);  
+app.use('/api/presupuestos', presupuestosRoutes);
 
 import detalle_presupuestoRoutes from './routes/detalle_presupuestoRoutes';
-app.use('/api/detalle_presupuesto', detalle_presupuestoRoutes);
+app.use('/api/detalles_presupuesto', detalle_presupuestoRoutes);
 
 const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => console.log(`Backend corriendo en puerto ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Backend corriendo en puerto ${PORT}`);
+  swaggerDocs(app, Number(PORT));
+});

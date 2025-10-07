@@ -41,7 +41,7 @@ export const crearCobro = async (req: Request, res: Response) => {
       include: { metodo_pago: true, tarjeta: true, transferencia: true },
     });
 
-    res.status(201).json(cobroCompleto);
+    res.status(201).json({ mensaje: 'Cobro creado correctamente.', cobro: cobroCompleto });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al crear el cobro.' });
@@ -71,7 +71,7 @@ export const getCobroPorId = async (req: Request, res: Response) => {
       res.status(404).json({ error: 'No existe el cobro con esta id' });
       return;
     }
-    res.json(cobro);
+    res.status(201).json({ mensaje: 'Cobro obtenido correctamente.', cobro: cobro});
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener el cobro.' });
