@@ -118,7 +118,7 @@ model presupuesto {
   fecha             DateTime @db.Date
   id_cliente        Int
   id_usuario        Int
-
+  
   cliente           cliente       @relation(fields: [id_cliente], references: [id_cliente])
   usuario           usuario       @relation(fields: [id_usuario], references: [id_usuario])
   facturas          factura_venta[]
