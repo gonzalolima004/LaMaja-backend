@@ -106,9 +106,10 @@ model factura_venta {
   fecha            DateTime @db.Date
   tipo             String
   id_cobro         Int
+  id_presupuesto   Int
 
-  cobro        cobro         @relation(fields: [id_cobro], references: [id_cobro])
-  presupuestos presupuesto[]
+  cobro        cobro        @relation(fields: [id_cobro], references: [id_cobro])
+  presupuesto  presupuesto  @relation(fields: [id_presupuesto], references: [id_presupuesto])
 }
 
 model presupuesto {
@@ -116,14 +117,14 @@ model presupuesto {
   importe_total     Int
   fecha             DateTime @db.Date
   id_cliente        Int
-  id_factura_venta  Int
   id_usuario        Int
 
   cliente           cliente       @relation(fields: [id_cliente], references: [id_cliente])
   usuario           usuario       @relation(fields: [id_usuario], references: [id_usuario])
-  factura_venta     factura_venta @relation(fields: [id_factura_venta], references: [id_factura_venta])
+  facturas          factura_venta[]
   detalles          detalle_presupuesto[]
 }
+
 
 model detalle_presupuesto {
   id_detalle_presupuesto Int @id @default(autoincrement())

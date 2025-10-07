@@ -3,7 +3,6 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 
-
 export const prisma = new PrismaClient();
 
 dotenv.config();
@@ -30,7 +29,10 @@ import facturaVentaRoutes from './routes/factura_ventaRoutes';
 app.use('/api/facturas_venta', facturaVentaRoutes);
 
 import presupuestosRoutes from './routes/presupuestosRoutes';
-app.use('/api/presupuestos', presupuestosRoutes);   
+app.use('/api/presupuestos', presupuestosRoutes);  
+
+import detalle_presupuestoRoutes from './routes/detalle_presupuestoRoutes';
+app.use('/api/detalle_presupuesto', detalle_presupuestoRoutes);
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Backend corriendo en puerto ${PORT}`));

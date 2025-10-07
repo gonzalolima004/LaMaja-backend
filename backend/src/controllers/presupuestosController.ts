@@ -2,26 +2,29 @@ import { Request, Response } from 'express';
 import { prisma } from '../index';
 
 export const crearPresupuesto = async (req: Request, res: Response) => {
-  const { importe_total, fecha, id_cliente, id_factura_venta, id_usuario, detalles } = req.body;
+  const { importe_total, fecha, id_cliente, id_usuario, detalles } = req.body;
 
   try {
     const nuevoPresupuesto = await prisma.presupuesto.create({
       data: {
         importe_total,
         fecha: new Date(fecha),
-        id_cliente,
-        id_factura_venta,
-        id_usuario,
-        detalles: {
-          create: detalles, 
+        cliente: {
+          connect: { id_cliente }
         },
+        usuario: {
+          connect: { id_usuario }
+        },
+        detalles: {
+          create: detalles // array de objetos con id_animal y precio
+        }
       },
       include: {
         cliente: true,
         usuario: true,
-        factura_venta: true,
-        detalles: { include: { animal: true } },
-      },
+        facturas: true, // relación 1:N con factura_venta
+        detalles: { include: { animal: true } }
+      }
     });
 
     res.status(201).json(nuevoPresupuesto);
@@ -37,9 +40,9 @@ export const getAllPresupuestos = async (req: Request, res: Response) => {
       include: {
         cliente: true,
         usuario: true,
-        factura_venta: true,
-        detalles: { include: { animal: true } }, // <-- ahora es detalles[]
-      },
+        facturas: true,
+        detalles: { include: { animal: true } }
+      }
     });
     res.json(presupuestos);
   } catch (error) {
@@ -56,9 +59,9 @@ export const getPresupuestoPorId = async (req: Request, res: Response) => {
       include: {
         cliente: true,
         usuario: true,
-        factura_venta: true,
-        detalles: { include: { animal: true } }, // <-- detalles[]
-      },
+        facturas: true,
+        detalles: { include: { animal: true } }
+      }
     });
     if (!presupuesto) {
       res.status(404).json({ error: 'No existe presupuesto con esta id' });
@@ -72,11 +75,11 @@ export const getPresupuestoPorId = async (req: Request, res: Response) => {
 
 export const editarPresupuesto = async (req: Request, res: Response) => {
   const id_presupuesto = parseInt(req.params.id);
-  const { importe_total, fecha, id_cliente, id_factura_venta, id_usuario } = req.body;
+  const { importe_total, fecha, id_cliente, id_usuario } = req.body;
 
   try {
     const presupuestoExistente = await prisma.presupuesto.findUnique({
-      where: { id_presupuesto },
+      where: { id_presupuesto }
     });
 
     if (!presupuestoExistente) {
@@ -88,16 +91,19 @@ export const editarPresupuesto = async (req: Request, res: Response) => {
       data: {
         importe_total,
         fecha: new Date(fecha),
-        id_cliente,
-        id_factura_venta,
-        id_usuario,
+        cliente: {
+          connect: { id_cliente }
+        },
+        usuario: {
+          connect: { id_usuario }
+        }
       },
       include: {
         cliente: true,
         usuario: true,
-        factura_venta: true,
-        detalles: { include: { animal: true } },
-      },
+        facturas: true,
+        detalles: { include: { animal: true } }
+      }
     });
 
     res.json({ mensaje: 'Presupuesto editado con éxito', presupuesto: presupuestoEditado });
@@ -107,13 +113,12 @@ export const editarPresupuesto = async (req: Request, res: Response) => {
   }
 };
 
-
 export const eliminarPresupuesto = async (req: Request, res: Response) => {
   const id_presupuesto = parseInt(req.params.id);
 
   try {
     await prisma.presupuesto.delete({
-      where: { id_presupuesto },
+      where: { id_presupuesto }
     });
     res.json({ mensaje: 'Presupuesto borrado con éxito', presupuesto: id_presupuesto });
   } catch (error) {

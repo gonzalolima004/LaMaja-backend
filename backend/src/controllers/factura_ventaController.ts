@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../index';
 
 export const crearFacturaVenta = async (req: Request, res: Response) => {
-  const { importe_total, fecha, tipo, id_cobro } = req.body;
+  const { importe_total, fecha, tipo, id_cobro, id_presupuesto } = req.body;
 
   try {
     const nuevaFactura = await prisma.factura_venta.create({
@@ -10,8 +10,13 @@ export const crearFacturaVenta = async (req: Request, res: Response) => {
         importe_total,
         fecha: new Date(fecha),
         tipo,
-        id_cobro,
-      },
+        cobro: {
+          connect: { id_cobro }
+        },
+        presupuesto: {
+          connect: { id_presupuesto }
+        }
+      }
     });
     res.status(201).json(nuevaFactura);
   } catch (error) {
@@ -23,7 +28,10 @@ export const crearFacturaVenta = async (req: Request, res: Response) => {
 export const getAllFacturaVenta = async (req: Request, res: Response) => {
   try {
     const facturas = await prisma.factura_venta.findMany({
-      include: { cobro: true, presupuestos: true },
+      include: {
+        cobro: true,
+        presupuesto: true
+      }
     });
     res.json(facturas);
   } catch (error) {
@@ -37,7 +45,10 @@ export const getFacturaVentaPorId = async (req: Request, res: Response) => {
   try {
     const factura = await prisma.factura_venta.findUnique({
       where: { id_factura_venta },
-      include: { cobro: true, presupuestos: true },
+      include: {
+        cobro: true,
+        presupuesto: true
+      }
     });
     if (!factura) {
       res.status(404).json({ error: 'No existe factura con esta id' });
@@ -51,11 +62,11 @@ export const getFacturaVentaPorId = async (req: Request, res: Response) => {
 
 export const editarFacturaVenta = async (req: Request, res: Response) => {
   const id_factura_venta = parseInt(req.params.id);
-  const { importe_total, fecha, tipo, id_cobro } = req.body;
+  const { importe_total, fecha, tipo, id_cobro, id_presupuesto } = req.body;
 
   try {
     const facturaExistente = await prisma.factura_venta.findUnique({
-      where: { id_factura_venta },
+      where: { id_factura_venta }
     });
 
     if (!facturaExistente) {
@@ -68,8 +79,13 @@ export const editarFacturaVenta = async (req: Request, res: Response) => {
         importe_total,
         fecha: new Date(fecha),
         tipo,
-        id_cobro,
-      },
+        cobro: {
+          connect: { id_cobro }
+        },
+        presupuesto: {
+          connect: { id_presupuesto }
+        }
+      }
     });
 
     res.json({ mensaje: 'Factura de venta editada con éxito', factura: facturaEditada });
@@ -84,7 +100,7 @@ export const eliminarFacturaVenta = async (req: Request, res: Response) => {
 
   try {
     await prisma.factura_venta.delete({
-      where: { id_factura_venta },
+      where: { id_factura_venta }
     });
     res.json({ mensaje: 'Factura de venta borrada con éxito', factura: id_factura_venta });
   } catch (error) {

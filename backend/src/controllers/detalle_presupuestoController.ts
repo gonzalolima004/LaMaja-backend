@@ -41,7 +41,7 @@ export const getDetallePorId = async (req: Request, res: Response) => {
       },
     });
     if (!detalle) {
-      return res.status(404).json({ error: 'No existe detalle de presupuesto con esta id' });
+      res.status(404).json({ error: 'No existe detalle de presupuesto con esta id' });
     }
     res.json(detalle);
   } catch (error) {
