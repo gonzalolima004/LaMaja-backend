@@ -7,12 +7,10 @@ services:
     ports:
       - "5000:5000"
     env_file:
-    - ./backend/.env
+      - ./backend/.env
     volumes:
       - ./backend:/app
       - /app/node_modules
-    depends_on:
-      - db
 
   frontend:
     build: ./frontend
@@ -24,15 +22,3 @@ services:
       - /app/node_modules
     depends_on:
       - backend
-
-  db:
-    image: postgres:15
-    container_name: db
-    environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: pass123
-    ports:
-      - "5432:5432"
-
-volumes:
-  db_data:
