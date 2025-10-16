@@ -3,20 +3,22 @@ import * as ReactDOM from 'react-dom/client';
 
 import App from './App';
 
-import { BrowserRouter } from 'react-router-dom';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
-root.render(
-    <>
-     
-    <BrowserRouter>
+// @ts-ignore
+import './assets/index.css';
 
-    <App />
 
-    </BrowserRouter>
+const rootElement = document.getElementById('root');
 
-    </>
-);
+if (rootElement) {
+  const root = ReactDOM.createRoot(rootElement);
+  root.render(
+
+      <App />
+
+  );
+} else {
+  console.error('Error')
+}
+
 
