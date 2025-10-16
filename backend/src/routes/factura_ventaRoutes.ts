@@ -1,5 +1,11 @@
 import express from 'express';
-import { crearFacturaVenta, getAllFacturaVenta, getFacturaVentaPorId, editarFacturaVenta, eliminarFacturaVenta } from '../controllers/factura_ventaController';
+import {
+  crearFacturaVenta,
+  getAllFacturaVenta,
+  getFacturaVentaPorId,
+  editarFacturaVenta,
+  eliminarFacturaVenta
+} from '../controllers/factura_ventaController';
 
 const router = express.Router();
 
@@ -33,9 +39,6 @@ const router = express.Router();
  *         tipo:
  *           type: string
  *           example: "Factura A"
- *         id_cobro:
- *           type: integer
- *           example: 2
  *         id_presupuesto:
  *           type: integer
  *           example: 5

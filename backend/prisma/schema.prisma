@@ -63,7 +63,7 @@ model procedimiento_veterinario {
   fecha                        DateTime  @db.Date
   id_animal                    Int
 
-  animal animal @relation(fields: [id_animal], references: [id_animal])
+  animal animal @relation(fields: [id_animal], references: [id_animal], onDelete: Cascade)
 }
 
 model metodo_pago {
@@ -74,21 +74,21 @@ model metodo_pago {
 }
 
 model cobro {
-  id_cobro       Int       @id @default(autoincrement())
-  importe_total  Decimal   @db.Decimal(10,2)
-  fecha          DateTime  @db.Date
-  id_metodo_pago Int
+  id_cobro           Int             @id @default(autoincrement())
+  importe_total      Decimal         @db.Decimal(10,2)
+  fecha              DateTime        @db.Date
+  id_metodo_pago     Int
+  id_factura_venta   Int             
 
-  metodo_pago    metodo_pago @relation(fields: [id_metodo_pago], references: [id_metodo_pago])
-  transferencia  transferencia?
-  tarjeta        tarjeta?
-  factura_ventas factura_venta[]
+  metodo_pago        metodo_pago     @relation(fields: [id_metodo_pago], references: [id_metodo_pago])
+  factura_venta      factura_venta   @relation(fields: [id_factura_venta], references: [id_factura_venta])
+  transferencia      transferencia?
+  tarjeta            tarjeta?
 }
 
 model transferencia {
   id_cobro Int @id
   titular  String
-  cuil     String
 
   cobro    cobro @relation(fields: [id_cobro], references: [id_cobro])
 }
@@ -101,15 +101,14 @@ model tarjeta {
 }
 
 model factura_venta {
-  id_factura_venta Int      @id @default(autoincrement())
+  id_factura_venta Int            @id @default(autoincrement())
   importe_total    Int
-  fecha            DateTime @db.Date
+  fecha            DateTime       @db.Date
   tipo             String
-  id_cobro         Int
   id_presupuesto   Int
 
-  cobro        cobro        @relation(fields: [id_cobro], references: [id_cobro])
-  presupuesto  presupuesto  @relation(fields: [id_presupuesto], references: [id_presupuesto])
+  presupuesto      presupuesto    @relation(fields: [id_presupuesto], references: [id_presupuesto])
+  cobros           cobro[]        
 }
 
 model presupuesto {
@@ -133,5 +132,5 @@ model detalle_presupuesto {
   precio                 Int
 
   presupuesto  presupuesto @relation(fields: [id_presupuesto], references: [id_presupuesto])
-  animal       animal      @relation(fields: [id_animal], references: [id_animal])
+  animal       animal      @relation(fields: [id_animal], references: [id_animal], onDelete: Cascade)
 }

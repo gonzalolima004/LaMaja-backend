@@ -6,7 +6,7 @@ export const crearCobro = async (req: Request, res: Response) => {
         importe_total,
         id_metodo_pago,
         titular,
-        cuil
+        id_factura_venta        
         } = req.body;
   try {
     const nuevoCobro = await prisma.cobro.create({
@@ -14,6 +14,7 @@ export const crearCobro = async (req: Request, res: Response) => {
         importe_total,
         fecha: new Date(),
         id_metodo_pago,
+        id_factura_venta
       },
     });
 
@@ -30,8 +31,7 @@ export const crearCobro = async (req: Request, res: Response) => {
       await prisma.transferencia.create({
         data: {
           id_cobro: nuevoCobro.id_cobro,
-          titular,
-          cuil
+          titular
         },
       });
     }

@@ -34,6 +34,9 @@ const router = express.Router();
  *         id_metodo_pago:
  *           type: integer
  *           example: 2
+ *         id_factura_venta:
+ *           type: integer
+ *           example: 1
  */
 
 /**
