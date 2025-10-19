@@ -2,56 +2,55 @@ import { Request, Response } from 'express';
 import { prisma } from '../index';
 
 export const crearPresupuesto = async (req: Request, res: Response) => {
-  const { importe_total, fecha, id_cliente, id_usuario, detalles } = req.body;
+  const { importe_total, fecha, detalles, cliente } = req.body;
 
   try {
+    // Crear cliente primero
+    const clienteCreado = await prisma.cliente.create({
+      data: {
+        nombre: cliente.nombre,
+        apellido: cliente.apellido,
+        dni: cliente.dni,
+        direccion: cliente.direccion
+      }
+    });
+
+    // Crear presupuesto relacionado al cliente
     const nuevoPresupuesto = await prisma.presupuesto.create({
       data: {
         importe_total,
         fecha: new Date(fecha),
-        cliente: {
-          connect: { id_cliente }
-        },
-        usuario: {
-          connect: { id_usuario }
-        },
+        id_cliente: clienteCreado.id_cliente,
         detalles: {
-          create: detalles
+          create: detalles.map((d: any) => ({
+            id_animal: d.id_animal,
+            precio: d.precio
+          }))
         }
       },
       include: {
         cliente: true,
-        usuario: {
-          select: {
-            id_usuario: true,
-            nombre: true,
-            apellido: true,
-          }
-        },
         facturas: true,
         detalles: { include: { animal: true } }
       }
     });
 
-    res.json({ mensaje: 'Presupuesto creado correctamente', presupuesto: nuevoPresupuesto });
+    res.json({
+      mensaje: 'Presupuesto creado correctamente',
+      presupuesto: nuevoPresupuesto
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al crear el presupuesto.' });
   }
 };
 
+
 export const getAllPresupuestos = async (req: Request, res: Response) => {
   try {
     const presupuestos = await prisma.presupuesto.findMany({
       include: {
         cliente: true,
-        usuario: {
-          select: {
-            id_usuario: true,
-            nombre: true,
-            apellido: true,
-          }
-        },
         facturas: true,
         detalles: { include: { animal: true } }
       }
@@ -70,13 +69,6 @@ export const getPresupuestoPorId = async (req: Request, res: Response) => {
       where: { id_presupuesto },
       include: {
         cliente: true,
-        usuario: {
-          select: {
-            id_usuario: true,
-            nombre: true,
-            apellido: true,
-          }
-        },
         facturas: true,
         detalles: { include: { animal: true } }
       }
@@ -94,7 +86,7 @@ export const getPresupuestoPorId = async (req: Request, res: Response) => {
 
 export const editarPresupuesto = async (req: Request, res: Response) => {
   const id_presupuesto = parseInt(req.params.id);
-  const { importe_total, fecha, id_cliente, id_usuario } = req.body;
+  const { importe_total, fecha, id_cliente } = req.body;
 
   try {
     const presupuestoExistente = await prisma.presupuesto.findUnique({
@@ -113,19 +105,9 @@ export const editarPresupuesto = async (req: Request, res: Response) => {
         cliente: {
           connect: { id_cliente }
         },
-        usuario: {
-          connect: { id_usuario }
-        }
       },
       include: {
         cliente: true,
-        usuario: {
-          select: {
-            id_usuario: true,
-            nombre: true,
-            apellido: true,
-          }
-        },
         facturas: true,
         detalles: { include: { animal: true } }
       }
