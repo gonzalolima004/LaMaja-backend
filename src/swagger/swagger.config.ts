@@ -12,8 +12,8 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: 'https://lamaja-backend.onrender.com',
-        description: 'Servidor montado en Render.com',
+        url: 'http://localhost:3001',
+        description: 'Servidor local',
       },
     ],
   },
