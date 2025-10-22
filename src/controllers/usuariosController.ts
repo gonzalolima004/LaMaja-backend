@@ -3,6 +3,7 @@ import { prisma } from '../index';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import nodemailer from 'nodemailer';
 
 dotenv.config();
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -215,5 +216,113 @@ export const getAllUsuarios = async (req: Request, res: Response) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Error al obtener los usuarios" });
+  }
+};
+
+export const recuperarContrasena = async (req: Request, res: Response): Promise<void> => {
+  const { email } = req.body;
+
+  try {
+    // 1️⃣ Buscar usuario
+    const usuario = await prisma.usuario.findUnique({ where: { email } });
+    if (!usuario) {
+      res.status(404).json({ error: 'No existe un usuario con ese email.' });
+      return;
+    }
+
+    if (!JWT_SECRET) {
+      res.status(500).json({ error: 'Falta JWT_SECRET en .env' });
+      return;
+    }
+
+    // 2️⃣ Generar token temporal
+    const tokenRecuperacion = jwt.sign(
+      { id_usuario: usuario.id_usuario, email: usuario.email },
+      JWT_SECRET,
+      { expiresIn: '1h' } // 1 hora
+    );
+
+    // 3️⃣ Crear enlace
+    const link = `${process.env.FRONTEND_URL}/restablecer/${tokenRecuperacion}`;
+
+    // 4️⃣ Configurar transporte de correo
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+
+    // 5️⃣ Enviar email
+    await transporter.sendMail({
+      from: `"La Maja" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Recuperación de contraseña - La Maja',
+      html: `
+        <div style="font-family: Arial, sans-serif; padding: 20px;">
+          <h2>Recuperación de contraseña</h2>
+          <p>Hola <b>${usuario.nombre}</b>, recibimos una solicitud para restablecer tu contraseña.</p>
+          <p>Haz clic en el siguiente enlace para crear una nueva contraseña (válido por 1 hora):</p>
+          <a href="${link}" style="display: inline-block; padding: 10px 20px; background-color: #345A35; color: #fff; text-decoration: none; border-radius: 6px;">Restablecer contraseña</a>
+          <p style="margin-top: 20px;">Si no solicitaste esto, ignora este mensaje.</p>
+        </div>
+      `
+    });
+
+    // 6️⃣ Responder
+    res.status(200).json({ mensaje: 'Correo de recuperación enviado correctamente.' });
+
+  } catch (error) {
+    console.error('Error en recuperación de contraseña:', error);
+    res.status(500).json({ error: 'No se pudo enviar el correo de recuperación.' });
+  }
+};
+
+export const restablecerContrasena = async (req: Request, res: Response): Promise<void> => {
+  const { token, nuevaContrasena } = req.body;
+
+  try {
+    if (!JWT_SECRET) {
+      res.status(500).json({ error: "Falta JWT_SECRET en .env" });
+      return;
+    }
+
+    // 1️⃣ Verificar token
+    let decoded: any;
+    try {
+      decoded = jwt.verify(token, JWT_SECRET);
+    } catch (error) {
+      res.status(400).json({ error: "Token inválido o expirado." });
+      return;
+    }
+
+    // 2️⃣ Buscar al usuario
+    const usuario = await prisma.usuario.findUnique({
+      where: { id_usuario: decoded.id_usuario },
+    });
+
+    if (!usuario) {
+      res.status(404).json({ error: "Usuario no encontrado." });
+      return;
+    }
+
+    // 3️⃣ Hashear nueva contraseña
+    const hash = await bcrypt.hash(nuevaContrasena, 10);
+
+    // 4️⃣ Actualizar contraseña
+    await prisma.usuario.update({
+      where: { id_usuario: usuario.id_usuario },
+      data: { contrasena: hash },
+    });
+
+    // 5️⃣ Responder
+    res.status(200).json({ message: "Contraseña restablecida correctamente." });
+
+  } catch (error) {
+    console.error("Error al restablecer contraseña:", error);
+    res.status(500).json({ error: "Error interno al restablecer la contraseña." });
   }
 };
