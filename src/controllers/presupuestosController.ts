@@ -62,27 +62,31 @@ export const getAllPresupuestos = async (req: Request, res: Response) => {
   }
 };
 
-export const getPresupuestoPorId = async (req: Request, res: Response) => {
-  const id_presupuesto = parseInt(req.params.id);
+export const getPresupuestoPorId = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+
   try {
     const presupuesto = await prisma.presupuesto.findUnique({
-      where: { id_presupuesto },
+      where: { id_presupuesto: parseInt(id) },
       include: {
         cliente: true,
         facturas: true,
-        detalles: { include: { animal: true } }
-      }
+        detalles: { include: { animal: true } },
+      },
     });
+
     if (!presupuesto) {
-      res.status(404).json({ error: 'No existe presupuesto con esta id' });
+      res.status(404).json({ error: "Presupuesto no encontrado." });
+      return
     }
-    res.json({ mensaje: 'Presupuesto obtenido correctamente', presupuesto: presupuesto });
-    
+
+    res.json(presupuesto);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al obtener el presupuesto.' });
+    console.error("Error al obtener presupuesto:", error);
+    res.status(500).json({ error: "Error al obtener presupuesto." });
   }
 };
+
 
 export const editarPresupuesto = async (req: Request, res: Response) => {
   const id_presupuesto = parseInt(req.params.id);
