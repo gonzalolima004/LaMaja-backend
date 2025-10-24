@@ -1,6 +1,7 @@
 import { Router } from 'express';
-import { registrar, login, verifyToken, getAllUsuarios } from '../controllers/usuariosController';
+import { registrar, login, verifyToken, getAllUsuarios, recuperarContrasena, restablecerContrasena } from '../controllers/usuariosController';
 import { verificarToken } from '../middlewares/verificarToken';
+
 
 const router = Router();
 
@@ -169,5 +170,7 @@ router.post('/registrar', registrar);
 router.post('/login', login);
 router.get('/verificar', verifyToken);
 router.get('/', getAllUsuarios);
+router.post('/recuperar', recuperarContrasena);
+router.post("/restablecer", restablecerContrasena);
 
 export default router;

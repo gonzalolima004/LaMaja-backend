@@ -1,26 +1,61 @@
 import { Request, Response } from 'express';
 import { prisma } from '../index';
 
-export const crearFacturaVenta = async (req: Request, res: Response) => {
+export const crearFacturaVenta = async (req: Request, res: Response): Promise<void> => {
   const { importe_total, fecha, tipo, id_presupuesto } = req.body;
 
   try {
+    const presupuesto = await prisma.presupuesto.findUnique({
+      where: { id_presupuesto },
+      include: { facturas: true },
+    });
+
+    if (!presupuesto) {
+    res.status(404).json({ error: "Presupuesto no encontrado." });
+    return
+    }
+
+    const totalFacturado = presupuesto.facturas.reduce(
+      (acc, factura) => acc + factura.importe_total,
+      0
+    );
+
+    const restante = presupuesto.importe_total - totalFacturado;
+
+    if (importe_total > restante) {
+        res.status(400).json({
+        error: `El monto supera el restante disponible (${restante}).`,
+      });
+    }
+
     const nuevaFactura = await prisma.factura_venta.create({
       data: {
         importe_total,
         fecha: new Date(fecha),
         tipo,
         presupuesto: {
-          connect: { id_presupuesto }
-        }
-      }
+          connect: { id_presupuesto },
+        },
+      },
+      include: {
+        presupuesto: {
+          include: { cliente: true, facturas: true },
+        },
+      },
     });
-    res.json({ mensaje: 'Factura creada correctamente', factura: nuevaFactura });
+
+    res.json({
+      mensaje: "Factura creada correctamente.",
+      factura: nuevaFactura,
+    });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error al crear la factura' });
+    console.error("Error al crear la factura:", error);
+    res
+      .status(500)
+      .json({ error: "Error al crear la factura o actualizar el presupuesto." });
   }
 };
+
 
 export const getAllFacturaVenta = async (req: Request, res: Response) => {
   try {
