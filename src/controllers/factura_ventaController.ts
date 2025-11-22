@@ -61,16 +61,23 @@ export const getAllFacturaVenta = async (req: Request, res: Response) => {
   try {
     const facturas = await prisma.factura_venta.findMany({
       include: {
-        presupuesto: true,
-        cobros: true 
+        presupuesto: {
+          include: {
+            cliente: true,
+            facturas: true
+          }
+        },
+        cobros: true
       }
     });
+
     res.json(facturas);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error al obtener las facturas de venta.' });
   }
 };
+
 
 
 export const getFacturaVentaPorId = async (req: Request, res: Response) => {
