@@ -7,7 +7,7 @@ export const crearAnimal = async (req: Request, res: Response) => {
   try {
     const nuevoAnimal = await prisma.animal.create({
       data: {
-        peso,
+        peso: Number(peso),
         sexo,
         estado,
         fecha_nacimiento: new Date(fecha_nacimiento),
@@ -64,7 +64,7 @@ export const editarAnimal = async (req: Request, res: Response) => {
     await prisma.animal.update({
       where: { id_animal },
       data: {
-        peso,
+        peso: Number(peso),
         sexo,
         estado,
         fecha_nacimiento: new Date(fecha_nacimiento),
