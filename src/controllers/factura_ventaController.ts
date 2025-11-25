@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '../index';
+import { prisma } from "../middlewares/prisma";
 
 export const crearFacturaVenta = async (req: Request, res: Response): Promise<void> => {
   const { importe_total, fecha, tipo, id_presupuesto } = req.body;

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '../index';
+import { prisma } from "../middlewares/prisma";
 
 // Crear cobro
 export const crearCobro = async (req: Request, res: Response) => {

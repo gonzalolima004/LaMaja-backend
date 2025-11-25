@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { prisma } from '../index';
+import { prisma } from "../middlewares/prisma";
 
 export const crearDetalle = async (req: Request, res: Response) => {
   const { id_presupuesto, id_animal, precio } = req.body;

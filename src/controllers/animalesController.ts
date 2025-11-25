@@ -1,5 +1,8 @@
 import { Request, Response } from 'express';
-import { prisma } from '../index';
+
+
+import { prisma } from "../middlewares/prisma";
+
 
 export const crearAnimal = async (req: Request, res: Response) => {
   const { peso, sexo, estado, fecha_nacimiento, vacunado } = req.body;
